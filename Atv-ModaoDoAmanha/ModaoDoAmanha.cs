@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace Atv_ModaoDoAmanha
@@ -15,28 +16,33 @@ namespace Atv_ModaoDoAmanha
         public double DescontoHoras()
         {
             bool descontoMensalidade = HorasPraticaSemanal > 10.0;
-            return descontoMensalidade ? (HorasPraticaSemanal * 0.15) - MensalidadeBase : MensalidadeBase;
+            return descontoMensalidade ? MensalidadeBase - (MensalidadeBase * 0.15)  : MensalidadeBase - (MensalidadeBase * 0.05);
         }
 
         public double HorasFaltantesProximoNivel()
         {
-            double Nivel1 = NivelHabilidade * 60;
-            double Nivel2 = NivelHabilidade * 80;
-            double Nivel3 = NivelHabilidade * 85;
-            double Nivel4 = NivelHabilidade * 90;
-            double Nivel5 = NivelHabilidade * 100;
-            return  HorasPraticaSemanal * 4;
+            double Progresso = HorasPraticaSemanal * 4;
+            return Progresso;
         }
+
+        public double ProximoNivel()
+        {
+            bool NivelAluno = HorasFaltantesProximoNivel() >= 180;
+            return NivelAluno ? (NivelHabilidade + 1) : NivelHabilidade;
+        }
+
+
 
         public double MensalidadeFinal()
         {
-            double valorFinal = DescontoHoras() / MensalidadeBase;
+            double valorFinal = (DescontoHoras() / MensalidadeBase) + DescontoHoras();
             return valorFinal;
         }
 
         public bool BolsaOrquestral()
         {
-            return (NivelHabilidade >= 3) || (HorasPraticaSemanal > 8);
+            double NovoNivel = ProximoNivel();
+            return (NovoNivel >= 3) && (HorasPraticaSemanal > 8);
         }
     }
 }       
